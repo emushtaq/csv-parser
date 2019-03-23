@@ -1,29 +1,30 @@
 package assignment.eshan.csvparser.payload;
 
-import java.util.ArrayList;
+import java.util.Map;
 
 public class ParseFileResponse {
-    private ArrayList labelMedians;
-    private long size;
+    private Map medians;
 
-    public ParseFileResponse(ArrayList labelMedians, long size) {
-        this.labelMedians = labelMedians;
-        this.size = size;
+    private String filename;
+
+    public ParseFileResponse(Map medians, String filename) {
+        this.medians = medians;
+        this.filename = filename;
     }
 
-    public ArrayList getLabelMedians() {
-        return labelMedians;
+    public Map getMedians() {
+        return medians;
     }
 
-    public void setLabelMedians(ArrayList labelMedians) {
-        this.labelMedians = labelMedians;
+    public void setMedians(Map medians) {
+        this.medians = medians;
     }
 
-    public long getSize() {
-        return size;
+    public String getFilename() {
+        return filename;
     }
 
-    public void setSize(long size) {
-        this.size = size;
+    public void setFilename(String filename) {
+        this.filename = filename;
     }
 }

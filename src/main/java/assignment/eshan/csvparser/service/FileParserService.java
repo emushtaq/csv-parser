@@ -17,10 +17,7 @@ import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
@@ -44,8 +41,9 @@ public class FileParserService {
         }
     }
 
-    public void parseCSV(MultipartFile file) {
+    public Map parseCSV(MultipartFile file) {
         BufferedReader br;
+        HashMap medians = new HashMap();
         try {
             InputStream is = file.getInputStream();
             br = new BufferedReader(new InputStreamReader(is));
@@ -56,28 +54,27 @@ public class FileParserService {
                     .withDelimiter(DELIMITER) // The sample CSV files used this delimiter
                     .withTrim());
 
-            System.out.println("CSV COLUMNS : " + csvParser.getHeaderMap());
-
             Map<String, List<CSVRecord>> groupedRows = StreamSupport.stream(csvParser.spliterator(), false)
                     .collect(Collectors.groupingBy(x->x.get(LABEL_COLUMN_NAME)));
+
+            if (groupedRows.size()==0){
+                return medians;
+            }
 
             for (Map.Entry<String, List<CSVRecord>> entry : groupedRows.entrySet()) {
                 String label = entry.getKey();
                 List<CSVRecord> values = entry.getValue();
-                System.out.println("---------------");
-                System.out.println("Label : " + label);
-                System.out.println("---------------\n\n");
-                CSVRecord median = getMedian(values);
-                System.out.println("-------- MEDIAN : " + median);
+                medians.put(label, getMedian(values));
             }
 
         } catch (IOException e) {
             System.err.println(e.getMessage());
         }
+
+        return medians;
     }
 
-    private CSVRecord getMedian(List<CSVRecord> values) {
-        values.forEach( (value) -> System.out.println(value) );
+    private Map getMedian(List<CSVRecord> values) {
         Collections.sort(values, (row1, row2) -> {
             CompareToBuilder rowComparer = new CompareToBuilder();
             for (int i=0; i<row1.size(); i++) {
@@ -90,27 +87,40 @@ public class FileParserService {
             return rowComparer.toComparison();
         });
 
-        System.out.println("---------------");
-        values.forEach( (value) -> System.out.println(value) );
-        System.out.println("---------------");
-        System.out.println("---------------");
         //If n is odd then Median (M) = value of ((n + 1)/2)th item term.
         //If n is even then Median (M) = value of [((n)/2)th item term + ((n)/2 + 1)th item term ]/2
-        int middle = values.size()/2;
-        if(middle % 2 != 0){
-            return values.get(middle);
-        } else {
-            return averageRows(values.get(middle-1), values.get(middle));
-        }
+        return computeMedian(values);
     }
 
-    private CSVRecord averageRows(CSVRecord row1, CSVRecord row2) {
-        for (int i=0; i<row1.size(); i++) {
+    private Map computeMedian(List<CSVRecord> values) {
+        if (values.size()>1) {
+            int middle = values.size() / 2;
+            if (middle % 2 != 0) {
+                Map median = values.get(middle).toMap();
+                median.remove("label");
+                return median;
+            } else {
+                CSVRecord row1 = values.get(middle - 1);
+                CSVRecord row2 = values.get(middle);
+                Map averageMap = row1.toMap();
+                System.out.println(row1);
+                System.out.println(averageMap);
+                averageMap.forEach((k, v) -> {
+                    try {
+                        averageMap.put(k, Double.valueOf(row1.get(String.valueOf(k)) + row2.get(String.valueOf(k))) / 2);
+                    } catch (NumberFormatException e) {
+                        return; // Use string value of the first row
+                    }
+                });
 
+                averageMap.remove("label");
+                return averageMap;
+            }
+        } else {
+            Map median = values.get(0).toMap();
+            median.remove("label");
+            return median;
         }
-
-        // TODO Handle string averaging
-        return row1;
     }
 
 }
