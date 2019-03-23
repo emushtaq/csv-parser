@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.util.Map;
 
 @RestController
@@ -26,8 +27,13 @@ public class CSVController {
 
     @PostMapping("/parseFile")
     public ParseFileResponse parseFile(@RequestParam("file") MultipartFile file, HttpServletRequest request, HttpServletResponse response) {
-        Map medians = fileParserService.parseCSV(file);
-        if(medians.isEmpty()) {
+        Map medians = null;
+        try {
+            medians = fileParserService.parseCSV(file);
+            if(medians.isEmpty()) {
+                response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            }
+        } catch (IOException e) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
         }
         return new ParseFileResponse(medians, file.getOriginalFilename());

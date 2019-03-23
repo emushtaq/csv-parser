@@ -8,3 +8,7 @@
 ### TODO
 - Test cases
 - Validating input
+
+### Run
+
+``` docker run -d  -p 8080:8080 <IMAGE_NAME>```

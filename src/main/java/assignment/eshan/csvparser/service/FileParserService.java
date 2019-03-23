@@ -41,34 +41,29 @@ public class FileParserService {
         }
     }
 
-    public Map parseCSV(MultipartFile file) {
+    public Map parseCSV(MultipartFile file) throws IOException{
         BufferedReader br;
         HashMap medians = new HashMap();
-        try {
-            InputStream is = file.getInputStream();
-            br = new BufferedReader(new InputStreamReader(is));
+        InputStream is = file.getInputStream();
+        br = new BufferedReader(new InputStreamReader(is));
 
-            CSVParser csvParser = new CSVParser(br, CSVFormat.DEFAULT
-                    .withFirstRecordAsHeader()
-                    .withIgnoreHeaderCase()
-                    .withDelimiter(DELIMITER) // The sample CSV files used this delimiter
-                    .withTrim());
+        CSVParser csvParser = new CSVParser(br, CSVFormat.DEFAULT
+                .withFirstRecordAsHeader()
+                .withIgnoreHeaderCase()
+                .withDelimiter(DELIMITER) // The sample CSV files used this delimiter
+                .withTrim());
 
-            Map<String, List<CSVRecord>> groupedRows = StreamSupport.stream(csvParser.spliterator(), false)
-                    .collect(Collectors.groupingBy(x->x.get(LABEL_COLUMN_NAME)));
+        Map<String, List<CSVRecord>> groupedRows = StreamSupport.stream(csvParser.spliterator(), false)
+                .collect(Collectors.groupingBy(x->x.get(LABEL_COLUMN_NAME)));
 
-            if (groupedRows.size()==0){
-                return medians;
-            }
+        if (groupedRows.size()==0){
+            return medians;
+        }
 
-            for (Map.Entry<String, List<CSVRecord>> entry : groupedRows.entrySet()) {
-                String label = entry.getKey();
-                List<CSVRecord> values = entry.getValue();
-                medians.put(label, getMedian(values));
-            }
-
-        } catch (IOException e) {
-            System.err.println(e.getMessage());
+        for (Map.Entry<String, List<CSVRecord>> entry : groupedRows.entrySet()) {
+            String label = entry.getKey();
+            List<CSVRecord> values = entry.getValue();
+            medians.put(label, getMedian(values));
         }
 
         return medians;
