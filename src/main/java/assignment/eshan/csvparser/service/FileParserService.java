@@ -22,6 +22,9 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.StreamSupport;
 
+/**
+ * Service class for file parsing
+ */
 @Service
 public class FileParserService {
 
@@ -41,6 +44,11 @@ public class FileParserService {
         }
     }
 
+    /** The main service that parses a CSV file and returns a map of median values grouped by the 'label' field in the CSV.
+     * @param file : The input CSV File
+     * @return medians: A hashmap containing median csv rows grouped by the 'label' field in the CSV
+     * @throws IOException
+     */
     public Map parseCSV(MultipartFile file) throws IOException{
         BufferedReader br;
         HashMap medians = new HashMap();
@@ -69,6 +77,10 @@ public class FileParserService {
         return medians;
     }
 
+    /** A method that computes the median value for a list of CSV Records
+     * @param values : A list of CSVRecords
+     * @return median values for the given CSVRecords
+     */
     private Map getMedian(List<CSVRecord> values) {
         Collections.sort(values, (row1, row2) -> {
             CompareToBuilder rowComparer = new CompareToBuilder();

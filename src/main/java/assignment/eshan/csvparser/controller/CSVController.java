@@ -34,7 +34,7 @@ public class CSVController {
                 response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             }
         } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
         }
         return new ParseFileResponse(medians, file.getOriginalFilename());
     }
