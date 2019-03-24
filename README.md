@@ -19,6 +19,16 @@ The application exposes the following endpoint:
 
 That's it! The result of the Median computation is downloaded as a file automatically.
 
+### Run Locally
+- Clone the repo https://github.com/emushtaq/csv-parser
+- ``cd csv-parser``
+- Create a WAR with ``mvnw package``
+- Run the application using ``java -jar target/csv-parser-0.0.1-SNAPSHOT.war``
+- Navigate to ``localhost:8080`` on the browser to view the client application.
+- Upload a CSV file adhering to the constraints of the application and hit Submit.
+
+That's it! The result of the Median computation is downloaded as a file automatically.
+
 ### Assumptions
 - ';' is the default and only allowed delimiter
 - The first row in the CSV is expected to be the header
