@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/emushtaq/csv-parser.svg?branch=master)](https://travis-ci.org/emushtaq/csv-parser)
+
 # CSV Parser
 A Servlet web application with Spring MVC and Tomcat. The web service and client application are used to parse CSVs and return the median value from the CSV grouped by a 'label' field. 
 
